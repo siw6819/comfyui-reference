@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ComfyUI Model Filename Decoder</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: #080c14;
+    font-family: 'Courier New', monospace;
+    padding: 32px 16px;
+    color: #e2e8f0;
+  }
+  .container { max-width: 780px; margin: 0 auto; }
+  .header { margin-bottom: 36px; border-left: 3px solid #00d4ff; padding-left: 16px; }
+  .header .sub { font-size: 10px; letter-spacing: 4px; color: #00d4ff; text-transform: uppercase; margin-bottom: 4px; }
+  .header h1 { font-size: 22px; font-weight: 700; color: #f8fafc; letter-spacing: 1px; }
+  .header .hint { font-size: 11px; color: #64748b; margin-top: 4px; }
+
+  .card {
+    background: #0f1623;
+    border: 1px solid #1e2a3a;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 28px;
+  }
+  .card-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* Quality bar */
+  .bar-track {
+    position: relative; height: 8px;
+    background: #1e2a3a; border-radius: 4px; margin-bottom: 28px;
+  }
+  .bar-fill {
+    position: absolute; inset: 0; border-radius: 4px;
+    background: linear-gradient(to right, #00d4ff, #818cf8, #a78bfa, #34d399, #4ade80, #facc15, #fb923c, #f87171);
+  }
+  .dots { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  .dot-item { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-label { font-size: 11px; color: #94a3b8; }
+  .bar-ends { display: flex; justify-content: space-between; margin-top: 10px; }
+  .bar-ends span { font-size: 9px; letter-spacing: 2px; }
+
+  /* Section */
+  .section { margin-bottom: 20px; }
+  .section-title {
+    font-size: 9px; letter-spacing: 3px;
+    text-transform: uppercase; margin-bottom: 8px; padding-left: 4px;
+  }
+  .rows { display: flex; flex-direction: column; gap: 2px; }
+  .row {
+    display: grid;
+    grid-template-columns: 160px 52px 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    background: #0f1623;
+    border: 1px solid #1e2a3a;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .row:hover { border-color: rgba(255,255,255,0.15); }
+  .row.open { border-color: var(--accent); background: var(--bg); }
+  .row .lbl { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .tag {
+    font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+    color: #0a0f1a; border-radius: 3px; padding: 2px 5px;
+    text-align: center; white-space: nowrap;
+  }
+  .row .desc { font-size: 12px; color: #64748b; line-height: 1.4; transition: color 0.15s; }
+  .row.open .desc { color: #e2e8f0; }
+
+  /* VRAM grid */
+  .vram-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+  .vram-card {
+    background: #080c14; border-radius: 5px; padding: 10px 12px;
+  }
+  .vram-title { font-size: 13px; font-weight: 700; }
+  .vram-rec { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+
+  .footer { font-size: 9px; color: #334155; text-align: center; margin-top: 24px; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="sub">ComfyUI Quick Reference</div>
+    <h1>MODEL FILENAME DECODER</h1>
+    <div class="hint">Click any row for details</div>
+  </div>
+
+  <!-- Quality bar -->
+  <div class="card">
+    <div class="card-label" style="color:#64748b">Quality Spectrum →</div>
+    <div class="bar-track"><div class="bar-fill"></div></div>
+    <div class="dots">
+      <div class="dot-item"><div class="dot" style="background:#f87171"></div><span class="dot-label">Q3_K_M</span></div>
+      <div class="dot-item"><div class="dot" style="background:#fb923c"></div><span class="dot-label">Q4_0</span></div>
+      <div class="dot-item"><div class="dot" style="background:#facc15"></div><span class="dot-label">Q4_K_M</span></div>
+      <div class="dot-item"><div class="dot" style="background:#4ade80"></div><span class="dot-label">Q5_K_M</span></div>
+      <div class="dot-item"><div class="dot" style="background:#34d399"></div><span class="dot-label">Q6_K</span></div>
+      <div class="dot-item"><div class="dot" style="background:#a78bfa"></div><span class="dot-label">Q8_0</span></div>
+      <div class="dot-item"><div class="dot" style="background:#818cf8"></div><span class="dot-label">FP8</span></div>
+      <div class="dot-item"><div class="dot" style="background:#00d4ff"></div><span class="dot-label">BF16/FP16</span></div>
+    </div>
+    <div class="bar-ends">
+      <span style="color:#f87171">LOWEST</span>
+      <span style="color:#00d4ff">HIGHEST</span>
+    </div>
+  </div>
+
+  <div id="sections"></div>
+
+  <!-- VRAM -->
+  <div class="card">
+    <div class="card-label" style="color:#fb923c">── VRAM → Best Format</div>
+    <div class="vram-grid">
+      <div class="vram-card" style="border:1px solid #00d4ff33"><div class="vram-title" style="color:#00d4ff">24 GB+</div><div class="vram-rec">Q8_0 or FP8</div></div>
+      <div class="vram-card" style="border:1px solid #34d39933"><div class="vram-title" style="color:#34d399">16 GB</div><div class="vram-rec">Q5_K_M / Q6_K</div></div>
+      <div class="vram-card" style="border:1px solid #facc1533"><div class="vram-title" style="color:#facc15">12 GB</div><div class="vram-rec">Q4_K_M</div></div>
+      <div class="vram-card" style="border:1px solid #f8717133"><div class="vram-title" style="color:#f87171">8 GB</div><div class="vram-rec">Q3_K_L ⚠️</div></div>
+    </div>
+  </div>
+
+  <div class="footer">K-QUANTS ALWAYS BEAT SAME-NUMBER PLAIN QUANTS · FP8 ≥ Q8 AT SIMILAR SIZE · SPLIT FILES = FULL PRECISION</div>
+</div>
+
+<script>
+const sections = [
+  {
+    title: "FORMAT", color: "#00d4ff", accent: "#003a4a",
+    items: [
+      { label: ".gguf", tag: "GGUF", desc: "Quantized, llama.cpp format. Most compatible with ComfyUI nodes." },
+      { label: ".safetensors", tag: "ST", desc: "Standard tensor format. Used for FP8, BNB, fine-tunes, official models." },
+    ]
+  },
+  {
+    title: "PRECISION / QUANTIZATION", color: "#a78bfa", accent: "#2a1a4a",
+    items: [
+      { label: "BF16 / F16", tag: "MAX", desc: "Near-lossless. Huge files. Only if you have 24GB+ VRAM." },
+      { label: "fp8_e4m3fn", tag: "FP8", desc: "8-bit float. Excellent quality/size. Slightly better than Q8 for transformers." },
+      { label: "fp8_e4m3fn_scaled", tag: "FP8+", desc: "FP8 with outlier correction. Best FP8 variant." },
+      { label: "bnb-nf4", tag: "NF4", desc: "4-bit via BitsAndBytes. Needs BNB library. Good for LLM-based models." },
+      { label: "Q8_0", tag: "Q8", desc: "GGUF 8-bit. Barely any quality loss vs full precision. 24GB sweet spot." },
+      { label: "Q6_K", tag: "Q6", desc: "GGUF 6-bit. Excellent. Good balance for 16–20GB." },
+      { label: "Q5_K_M", tag: "Q5", desc: "GGUF 5-bit. Very good. Sweet spot for 16GB." },
+      { label: "Q4_K_M", tag: "Q4K", desc: "GGUF 4-bit K-quant (medium). Best 4-bit option. 12GB sweet spot." },
+      { label: "Q4_K_S", tag: "Q4S", desc: "GGUF 4-bit K-quant (small). Slightly smaller than _M, slightly worse." },
+      { label: "Q4_0 / Q4_1", tag: "Q4", desc: "Older 4-bit. Worse than K-quants at same size. Avoid if K variant exists." },
+      { label: "Q3_K_L/M/S", tag: "Q3", desc: "3-bit. Noticeable degradation. Only for 8GB or smaller VRAM." },
+    ]
+  },
+  {
+    title: "THE K-QUANT SUFFIX", color: "#34d399", accent: "#0a2a1f",
+    items: [
+      { label: "_K = K-quant", tag: "K", desc: "Smarter bit allocation across layers. Always prefer _K over plain Q4_0/Q4_1." },
+      { label: "_L / _M / _S", tag: "SIZE", desc: "Large / Medium / Small — different internal block sizes. _M is usually the sweet spot." },
+    ]
+  },
+  {
+    title: "SPLIT FILES", color: "#fb923c", accent: "#2a1000",
+    items: [
+      { label: "00001-of-00004", tag: "SPLIT", desc: "Official model split across multiple files. Usually BF16/FP16. Load as one in ComfyUI." },
+    ]
+  },
+  {
+    title: "COMMUNITY / FINE-TUNE FLAGS", color: "#f472b6", accent: "#2a0a1a",
+    items: [
+      { label: "AIO", tag: "AIO", desc: "All-in-one — LoRAs or tweaks baked into the weights." },
+      { label: "SFW / NSFW", tag: "FILTER", desc: "Content filtering applied (or removed) in the fine-tune." },
+      { label: "Rapid / v22 etc.", tag: "FT", desc: "Community fine-tune, not the base model. Check the model page for what was changed." },
+    ]
+  },
+];
+
+const container = document.getElementById('sections');
+let openId = null;
+
+sections.forEach(section => {
+  const div = document.createElement('div');
+  div.className = 'section';
+  div.innerHTML = `<div class="section-title" style="color:${section.color}">── ${section.title}</div><div class="rows" id="rows-${section.title}"></div>`;
+  container.appendChild(div);
+
+  const rows = div.querySelector('.rows');
+  section.items.forEach((item, i) => {
+    const id = `${section.title}-${i}`;
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.style.setProperty('--accent', section.color + '55');
+    row.style.setProperty('--bg', section.accent);
+    row.innerHTML = `
+      <span class="lbl" style="color:${section.color}">${item.label}</span>
+      <span class="tag" style="background:${section.color}">${item.tag}</span>
+      <span class="desc">${item.desc}</span>
+    `;
+    row.addEventListener('click', () => {
+      if (openId === id) {
+        row.classList.remove('open');
+        openId = null;
+      } else {
+        if (openId) document.querySelector('.row.open')?.classList.remove('open');
+        row.classList.add('open');
+        openId = id;
+      }
+    });
+    rows.appendChild(row);
+  });
+});
+</script>
+</body>
+</html>
