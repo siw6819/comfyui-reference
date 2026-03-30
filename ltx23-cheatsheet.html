@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LTX 2.3 ComfyUI Cheat Sheet</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+    :root {
+      --bg: #07090f;
+      --bg2: #0d1117;
+      --bg3: #111820;
+      --border: #1a2535;
+      --border2: #243040;
+      --text: #dce6f0;
+      --muted: #4a6070;
+      --cyan: #00c8f0;
+      --cyan-dim: #00c8f022;
+      --green: #39e8a0;
+      --green-dim: #39e8a015;
+      --amber: #f0b030;
+      --amber-dim: #f0b03015;
+      --pink: #e060c0;
+      --pink-dim: #e060c015;
+      --purple: #9060f0;
+      --purple-dim: #9060f015;
+      --red: #f05060;
+      --red-dim: #f0506015;
+      --blue: #4090f0;
+      --blue-dim: #4090f015;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 40px 24px 60px;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      border: 1.5px solid var(--cyan);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+
+    /* Grid layout */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    /* Section cards */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-head-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .card-head-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .card-body {
+      padding: 12px 14px;
+    }
+
+    /* Comparison rows */
+    .cmp {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .cmp-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .cmp-row:last-child {
+      border-bottom: none;
+    }
+
+    .cmp-key {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding-top: 2px;
+    }
+
+    .cmp-val {
+      line-height: 1.5;
+    }
+
+    .cmp-head {
+      display: grid;
+      grid-template-columns: 80px 1fr 1fr;
+      gap: 8px;
+      padding: 0 0 6px;
+      border-bottom: 1px solid var(--border2);
+      margin-bottom: 4px;
+    }
+
+    .cmp-head span {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* LoRA stack */
+    .lora-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .lora-row {
+      display: grid;
+      grid-template-columns: 16px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .lora-num {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .lora-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .lora-detail {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .lora-strength {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .connector {
+      display: flex;
+      align-items: center;
+      padding-left: 22px;
+      margin: 1px 0;
+    }
+
+    .connector-line {
+      width: 1px;
+      height: 6px;
+      background: var(--border2);
+      margin-left: 6px;
+    }
+
+    /* Upscaler cards */
+    .up-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .up-card {
+      display: grid;
+      grid-template-columns: 52px 1fr auto;
+      align-items: start;
+      gap: 10px;
+      padding: 9px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .up-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      padding-top: 2px;
+    }
+
+    .up-name {
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .up-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .up-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    /* Workflow pipeline */
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .pipe-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .pipe-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .pipe-label {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .pipe-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .pipe-arrow {
+      padding-left: 21px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      color: var(--border2);
+    }
+
+    /* Scheduler table */
+    .sched-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .sched-table th {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 6px 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .sched-table td {
+      font-size: 11px;
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .sched-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .sched-name {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 1px 5px;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Dimension rules */
+    .dim-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .dim-card {
+      padding: 10px 12px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .dim-title {
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .dim-vals {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .dim-vals .good {
+      color: var(--green);
+    }
+
+    .dim-vals .bad {
+      color: var(--red);
+      text-decoration: line-through;
+    }
+
+    .dim-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    /* Warning / tip boxes */
+    .tip {
+      font-size: 11px;
+      line-height: 1.6;
+      padding: 8px 10px;
+      border-radius: 4px;
+      border-left: 2px solid;
+      margin-top: 8px;
+    }
+
+    .tip-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    /* Colour helpers */
+    .c-cyan {
+      color: var(--cyan);
+    }
+
+    .c-green {
+      color: var(--green);
+    }
+
+    .c-amber {
+      color: var(--amber);
+    }
+
+    .c-pink {
+      color: var(--pink);
+    }
+
+    .c-purple {
+      color: var(--purple);
+    }
+
+    .c-red {
+      color: var(--red);
+    }
+
+    .c-blue {
+      color: var(--blue);
+    }
+
+    .c-muted {
+      color: var(--muted);
+    }
+
+    .bg-cyan {
+      background: var(--cyan-dim);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .bg-green {
+      background: var(--green-dim);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .bg-amber {
+      background: var(--amber-dim);
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+
+    .bg-pink {
+      background: var(--pink-dim);
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+
+    .bg-purple {
+      background: var(--purple-dim);
+      border-color: var(--purple);
+      color: var(--purple);
+    }
+
+    .bg-red {
+      background: var(--red-dim);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .bg-blue {
+      background: var(--blue-dim);
+      border-color: var(--blue);
+      color: var(--blue);
+    }
+
+    .footer {
+      margin-top: 32px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background-color: #031f4a;
+    }
+
+    nav a {
+      text-decoration: none;
+      font-weight: bold;
+      color: #b3b3b3;
+    }
+
+    nav a:hover {
+      color: #0077cc;
+    }
+
+    .header {
+      margin-bottom: 36px;
+      border-left: 3px solid #00d4ff;
+      padding-left: 16px;
+    }
+
+    .header .sub {
+      font-size: 10px;
+      letter-spacing: 4px;
+      color: #00d4ff;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: 1px;
+    }
+
+    .header .hint {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+    <nav>
+      <ul>
+        <li><a href="index.html">MODEL FILENAME DECODER</a></li>
+        <li>|</li>
+        <li><a href="ltx23-cheatsheet.html">LTX 2.3 CHEAT SHEET</a></li>
+      </ul>
+    </nav>
+
+  <div class="page">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="sub">ComfyUI Quick Reference</div>
+      <h1>LTX 2.3 [i2v] CHEAT SHEET</h1>
+      <div class="hint">Generated by Claude. Image-to-video workflow reference</div>
+    </div>
+
+    <!-- Row 1: Dev vs Distilled + Recommended Workflow -->
+    <div class="grid" style="margin-bottom:14px">
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-dot" style="background:var(--cyan)"></div>
+          <div class="card-head-title c-cyan">Dev vs Distilled</div>
+        </div>
+        <div class="card-body">
+          <div class="cmp">
+            <div class="cmp-head">
+              <span></span>
+              <span class="c-purple">DEV</span>
+              <span class="c-green">DISTILLED</span>
+            </div>
+            <div class="cmp-row">
+              <div class="cmp-key">Steps</div>
+              <div class="cmp-val c-purple">40 – 80</div>
+              <div class="cmp-val c-green">4 – 8</div>
+            </div>
+            <div class="cmp-row">
+              <div class="cmp-key">CFG</div>
+              <div class="cmp-val c-purple">3 – 7</div>
+              <div class="cmp-val c-green">1.0 – 1.5 only</div>
+            </div>
+            <div class="cmp-row">
+              <div class="cmp-key">Scheduler</div>
+              <div class="cmp-val c-purple">Euler, DPM++</div>
+              <div class="cmp-val c-green">LCM / TCD</div>
+            </div>
+            <div class="cmp-row">
+              <div class="cmp-key">Quality</div>
+              <div class="cmp-val c-purple">Highest fidelity</div>
+              <div class="cmp-val c-green">Slightly softer</div>
+            </div>
+            <div class="cmp-row">
+              <div class="cmp-key">Speed</div>
+              <div class="cmp-val c-purple">Slow</div>
+              <div class="cmp-val c-green">~10× faster</div>
+            </div>
+            <div class="cmp-row">
+              <div class="cmp-key">LoRAs</div>
+              <div class="cmp-val c-purple">Use dev-trained</div>
+              <div class="cmp-val c-green">Use distilled-trained</div>
+            </div>
+          </div>
+          <div class="tip bg-red" style="margin-top:10px">
+            <div class="tip-label">Warning</div>
+            Distilled model + wrong CFG or scheduler = blurry, washed-out output. Always check model card settings.
+          </div>
+          <div class="tip bg-cyan" style="margin-top:6px">
+            <div class="tip-label">Distilled LoRA</div>
+            Separate adapter that adds distilled behaviour to a <em>dev</em> base model. If your base file already says
+            <code style="font-family:'IBM Plex Mono',monospace">distilled</code>, you don't need it.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-dot" style="background:var(--green)"></div>
+          <div class="card-head-title c-green">Recommended I2V Pipeline</div>
+        </div>
+        <div class="card-body">
+          <div class="pipeline">
+            <div class="pipe-step">
+              <div class="pipe-icon bg-blue"
+                style="background:var(--blue-dim);color:var(--blue);border:1px solid var(--blue)">IN</div>
+              <div>
+                <div class="pipe-label">Input image</div>
+                <div class="pipe-note">Dimensions must be multiples of 32 (ideally 64) — see dimensions section</div>
+              </div>
+            </div>
+            <div class="pipe-arrow">↓</div>
+            <div class="pipe-step">
+              <div class="pipe-icon"
+                style="background:var(--purple-dim);color:var(--purple);border:1px solid var(--purple)">GEN</div>
+              <div>
+                <div class="pipe-label">Base model generation</div>
+                <div class="pipe-note">ltx-2.3-22b-dev or distilled, with LoRA stack applied</div>
+              </div>
+            </div>
+            <div class="pipe-arrow">↓</div>
+            <div class="pipe-step">
+              <div class="pipe-icon" style="background:var(--cyan-dim);color:var(--cyan);border:1px solid var(--cyan)">
+                S↑</div>
+              <div>
+                <div class="pipe-label">Spatial upscaler</div>
+                <div class="pipe-note">x1.5 or x2 — boost frame resolution</div>
+              </div>
+            </div>
+            <div class="pipe-arrow">↓</div>
+            <div class="pipe-step">
+              <div class="pipe-icon"
+                style="background:var(--green-dim);color:var(--green);border:1px solid var(--green)">T↑</div>
+              <div>
+                <div class="pipe-label">Temporal upscaler</div>
+                <div class="pipe-note">x2 frame interpolation — smooth motion</div>
+              </div>
+            </div>
+            <div class="pipe-arrow">↓</div>
+            <div class="pipe-step">
+              <div class="pipe-icon"
+                style="background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber)">OUT</div>
+              <div>
+                <div class="pipe-label">Final video output</div>
+                <div class="pipe-note">High res, smooth framerate</div>
+              </div>
+            </div>
+          </div>
+          <div class="tip bg-amber" style="margin-top:10px">
+            <div class="tip-label">Tip</div>
+            Always generate small, then upscale. Generating at 512px → spatial x2 is faster and often higher quality
+            than native 1024px generation.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Row 2: LoRA Stack -->
+    <div class="grid" style="margin-bottom:14px">
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-dot" style="background:var(--pink)"></div>
+          <div class="card-head-title c-pink">LoRA Stack · Merge Order &amp; Strengths</div>
+        </div>
+        <div class="card-body">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+            LoRAs are merged simultaneously, not sequentially — order determines which delta wins when layers conflict.
+            Principle: <strong style="color:var(--text)">foundational → conditioning → creative → corrective</strong>
+          </div>
+          <div class="lora-stack">
+
+            <div class="lora-row" style="border-color:#9060f044;background:#1a1030">
+              <div class="lora-num c-purple">1</div>
+              <div>
+                <div class="lora-name c-purple">Distilled LoRA</div>
+                <div class="lora-detail">Foundation — fast inference behaviour. Skip if base model is already distilled.
+                </div>
+              </div>
+              <div class="lora-strength" style="background:var(--purple-dim);color:var(--purple)">0.8–1.0</div>
+            </div>
+
+            <div class="connector">
+              <div class="connector-line"></div>
+            </div>
+
+            <div class="lora-row" style="border-color:#4090f044;background:#0a1830">
+              <div class="lora-num c-blue">2</div>
+              <div>
+                <div class="lora-name c-blue">Image2Vid Adapter</div>
+                <div class="lora-detail">Input conditioning — how the model reads your source image.</div>
+              </div>
+              <div class="lora-strength" style="background:var(--blue-dim);color:var(--blue)">0.7–0.9</div>
+            </div>
+
+            <div class="connector">
+              <div class="connector-line"></div>
+            </div>
+
+            <div class="lora-row" style="border-color:#00c8f044;background:#001820">
+              <div class="lora-num c-cyan">3</div>
+              <div>
+                <div class="lora-name c-cyan">Character LoRA</div>
+                <div class="lora-detail">Subject identity — who is in the scene. Establishes subject before motion.
+                </div>
+              </div>
+              <div class="lora-strength" style="background:var(--cyan-dim);color:var(--cyan)">0.6–0.85</div>
+            </div>
+
+            <div class="connector">
+              <div class="connector-line"></div>
+            </div>
+
+            <div class="lora-row" style="border-color:#f0b03044;background:#1a1000">
+              <div class="lora-num c-amber">4</div>
+              <div>
+                <div class="lora-name c-amber">Motion LoRA</div>
+                <div class="lora-detail">Movement behaviour. Applied to the established subject. Can be aggressive —
+                  dial down if fighting character LoRA.</div>
+              </div>
+              <div class="lora-strength" style="background:var(--amber-dim);color:var(--amber)">0.5–0.75</div>
+            </div>
+
+            <div class="connector">
+              <div class="connector-line"></div>
+            </div>
+
+            <div class="lora-row" style="border-color:#39e8a044;background:#001a10">
+              <div class="lora-num c-green">5</div>
+              <div>
+                <div class="lora-name c-green">Detailer (ic-lora)</div>
+                <div class="lora-detail">Corrective — recovers face/eye/hand detail. Has final say in contested layers.
+                  Run lighter to avoid over-sharpening.</div>
+              </div>
+              <div class="lora-strength" style="background:var(--green-dim);color:var(--green)">0.4–0.6</div>
+            </div>
+
+          </div>
+          <div class="tip bg-amber" style="margin-top:10px">
+            <div class="tip-label">Conflict tip</div>
+            If character + motion fight (weird limbs), drop motion strength first. Or move character above motion in
+            your node stack.
+          </div>
+        </div>
+      </div>
+
+      <!-- Upscalers + Schedulers stacked -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-dot" style="background:var(--cyan)"></div>
+            <div class="card-head-title c-cyan">Upscalers</div>
+          </div>
+          <div class="card-body">
+            <div class="up-grid">
+              <div class="up-card">
+                <div class="up-badge c-cyan">x1.5<br><span style="font-size:9px;color:var(--muted)">SPATIAL</span></div>
+                <div>
+                  <div class="up-name">Spatial · conservative</div>
+                  <div class="up-desc">Boosts each frame's resolution by 1.5×. Less aggressive — use when x2 feels soft
+                    or introduces artefacts.</div>
+                </div>
+                <div><span class="badge bg-cyan">FRAMES</span></div>
+              </div>
+              <div class="up-card">
+                <div class="up-badge c-blue">x2<br><span style="font-size:9px;color:var(--muted)">SPATIAL</span></div>
+                <div>
+                  <div class="up-name">Spatial · full</div>
+                  <div class="up-desc">Doubles frame resolution. Prefer v1.1 over v1.0 if you have both — improved
+                    detail recovery.</div>
+                </div>
+                <div><span class="badge bg-blue">FRAMES</span></div>
+              </div>
+              <div class="up-card">
+                <div class="up-badge c-green">x2<br><span style="font-size:9px;color:var(--muted)">TEMPORAL</span></div>
+                <div>
+                  <div class="up-name">Temporal · framerate</div>
+                  <div class="up-desc">Doubles frame <em>count</em> by synthesising in-between frames. Smooths motion —
+                    not a resolution boost.</div>
+                </div>
+                <div><span class="badge bg-green">FPS</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="card-head-dot" style="background:var(--amber)"></div>
+            <div class="card-head-title c-amber">Schedulers vs Manual Sigmas</div>
+          </div>
+          <div class="card-body">
+
+            <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+              Sigmas are noise levels — a list of numbers from high (lots of noise) to low (nearly clean). Each number
+              is one denoising step. A <strong style="color:var(--text)">scheduler</strong> calculates this list
+              automatically. <strong style="color:var(--text)">Manual sigmas</strong> let you write the list yourself,
+              giving you direct control over how noise is removed at each step.
+            </div>
+
+            <!-- What sigma values mean -->
+            <div style="margin-bottom:10px;">
+              <div
+                style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">
+                What the numbers mean</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px 10px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--red)">1.0
+                  </div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:2px">Pure noise — start of generation. Always
+                    the first value.</div>
+                </div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px 10px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--amber)">
+                    0.5 – 0.7</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:2px">Mid-range — structure and motion being
+                    laid down.</div>
+                </div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:8px 10px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--green)">
+                    0.0 – 0.05</div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:2px">Near-clean — fine detail and sharpening.
+                    Last value.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- LTXVScheduler -->
+            <div style="margin-bottom:10px;">
+              <div
+                style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">
+                LTXVScheduler — parameters</div>
+              <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px;">
+                <div
+                  style="display:grid;grid-template-columns:100px 60px 1fr;gap:8px;align-items:start;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--cyan)">
+                    steps</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber)">20 – 50</div>
+                  <div style="font-size:11px;color:var(--muted);line-height:1.5">How many sigma values to generate. Each
+                    = one denoising step. Dev model: 20–50. Distilled: use manual sigmas instead.</div>
+                </div>
+                <div
+                  style="display:grid;grid-template-columns:100px 60px 1fr;gap:8px;align-items:start;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--cyan)">
+                    max_shift</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber)">2.05</div>
+                  <div style="font-size:11px;color:var(--muted);line-height:1.5">Curve shape for high-res / high
+                    frame-count latents. Higher = more denoising energy in early steps. Leave at default unless tuning
+                    for a specific resolution.</div>
+                </div>
+                <div
+                  style="display:grid;grid-template-columns:100px 60px 1fr;gap:8px;align-items:start;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--cyan)">
+                    base_shift</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber)">0.95</div>
+                  <div style="font-size:11px;color:var(--muted);line-height:1.5">Same as max_shift but for low-res / low
+                    frame-count latents. Scheduler interpolates between base and max depending on token count. Leave at
+                    default.</div>
+                </div>
+                <div
+                  style="display:grid;grid-template-columns:100px 60px 1fr;gap:8px;align-items:start;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--cyan)">
+                    stretch</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber)">true</div>
+                  <div style="font-size:11px;color:var(--muted);line-height:1.5">Snaps the last non-zero step to exactly
+                    the terminal value. Almost always want this on — without it the schedule may not land cleanly at
+                    your chosen terminal.</div>
+                </div>
+                <div
+                  style="display:grid;grid-template-columns:100px 60px 1fr;gap:8px;align-items:start;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--cyan)">
+                    terminal</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber)">0.0 – 0.1</div>
+                  <div style="font-size:11px;color:var(--muted);line-height:1.5"><span
+                      style="color:var(--text)">0.0</span> = fully clean final step. <span
+                      style="color:var(--text)">0.05</span> = leaves a trace of noise, can mask artefacts and harsh
+                    edges. Try 0.05 if output has banding.</div>
+                </div>
+              </div>
+              <div style="background:var(--bg3);border:1px solid #f0506044;border-radius:4px;padding:8px 10px;">
+                <div
+                  style="font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:4px">
+                  Key asymmetry — no start sigma control</div>
+                <div style="font-size:11px;color:var(--muted);line-height:1.6">LTXVScheduler controls where the schedule
+                  <em style="color:var(--text)">ends</em> (terminal) but not where it <em
+                    style="color:var(--text)">starts</em>. The start is determined automatically from the shift
+                  parameters and your latent's token count. To start from e.g. <span
+                    style="font-family:'IBM Plex Mono',monospace;color:var(--cyan)">0.9</span> instead of <span
+                    style="font-family:'IBM Plex Mono',monospace;color:var(--cyan)">1.0</span> — anchoring tightly to
+                  your input image — you need manual sigmas. This is the main practical reason to reach for manual
+                  sigmas over the scheduler.</div>
+              </div>
+            </div>
+
+            <!-- Manual sigmas reference -->
+            <div style="margin-bottom:10px;">
+              <div
+                style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">
+                Manual Sigmas — required for distilled + stage 2 refinement</div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+
+                <div style="background:var(--bg3);border:1px solid #9060f044;border-radius:4px;padding:8px 10px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <span style="font-size:11px;font-weight:500;color:var(--purple)">Distilled · stage 1 · 8
+                      steps</span>
+                    <span class="badge bg-purple">DEFAULT</span>
+                  </div>
+                  <div
+                    style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:0.5px;margin-bottom:4px">
+                    1.0, 0.9933, 0.9850, 0.9767, 0.9008, 0.6180, 0.4219, 0.0</div>
+                  <div style="font-size:10px;color:var(--muted);line-height:1.5">Official default from Lightricks. Steps
+                    stay close together at the high end (structure), then a bigger jump down to 0.618, then 0.42 for
+                    detail, then hard stop at 0. 8 values = 8 steps. CFG = 1.0–1.5.</div>
+                </div>
+
+                <div style="background:var(--bg3);border:1px solid #39e8a044;border-radius:4px;padding:8px 10px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <span style="font-size:11px;font-weight:500;color:var(--green)">Stage 2 refinement · after spatial
+                      upscale</span>
+                    <span class="badge bg-green">REFINE</span>
+                  </div>
+                  <div
+                    style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:0.5px;margin-bottom:4px">
+                    0.5, 0.421875, 0.0</div>
+                  <div style="font-size:10px;color:var(--muted);line-height:1.5">Only 3 steps. Starts mid-range (0.5) —
+                    you're refining an already-structured latent, not generating from scratch. Equivalent to roughly
+                    denoise = 0.47. Keep stage 2 denoising strength 0.35–0.55.</div>
+                </div>
+
+                <div style="background:var(--bg3);border:1px solid #f0b03044;border-radius:4px;padding:8px 10px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <span style="font-size:11px;font-weight:500;color:var(--amber)">Distilled · 5-step lighter
+                      variant</span>
+                    <span class="badge bg-amber">FAST</span>
+                  </div>
+                  <div
+                    style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:0.5px;margin-bottom:4px">
+                    0.987, 0.85, 0.725, 0.422, 0.0</div>
+                  <div style="font-size:10px;color:var(--muted);line-height:1.5">Community-found 5-step schedule. Bigger
+                    jumps = faster but coarser. Ending on 0.0 gives a pure denoise final step (no grain). Try 0.05 as
+                    the last value if output looks too sharp.</div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Reading the numbers -->
+            <div
+              style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">
+              Tuning logic</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              <div class="tip bg-red" style="margin-top:0">
+                <div class="tip-label">Too noisy / grainy</div>
+                Lower the first value slightly (e.g. 1.0 → 0.987). Less initial noise = calmer start.
+              </div>
+              <div class="tip bg-blue" style="margin-top:0">
+                <div class="tip-label">Too soft / blurry</div>
+                Add more steps in the 0.4–0.7 range. More mid-range steps = more detail pass time.
+              </div>
+              <div class="tip bg-amber" style="margin-top:0">
+                <div class="tip-label">Artefacts at end</div>
+                Try ending on 0.05 instead of 0.0. A small final sigma leaves a trace of noise that can mask hard
+                artefacts.
+              </div>
+              <div class="tip bg-green" style="margin-top:0">
+                <div class="tip-label">Logo / watermark glitch</div>
+                Known LTX issue on long videos. Adjust first sigma value up slightly and ensure prompt is long enough to
+                guide the full clip.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Row 3: Dimensions -->
+    <div class="card full" style="margin-bottom:14px">
+      <div class="card-head">
+        <div class="card-head-dot" style="background:var(--blue)"></div>
+        <div class="card-head-title c-blue">Output Dimensions</div>
+      </div>
+      <div class="card-body">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">
+          Video diffusion models operate on patches/tiles. Dimensions that aren't multiples of 64 get padded internally,
+          which wastes compute and can cause subtle edge artefacts. Always snap to the nearest valid value.
+        </div>
+        <div class="dim-grid">
+          <div class="dim-card">
+            <div class="dim-title c-green">Common valid resolutions</div>
+            <div class="dim-vals">
+              <span class="good">1280 × 704</span> &nbsp;<span style="font-size:10px;color:var(--muted)">(≈ 16:9, not
+                720)</span><br>
+              <span class="good">1024 × 576</span><br>
+              <span class="good">896 × 512</span><br>
+              <span class="good">768 × 448</span><br>
+              <span class="good">512 × 512</span>
+            </div>
+          </div>
+          <div class="dim-card">
+            <div class="dim-title c-red">Avoid these</div>
+            <div class="dim-vals">
+              <span class="bad">1280 × 720</span> &nbsp;<span style="font-size:10px;color:var(--muted)">(720 ÷ 64 =
+                11.25 ✗)</span><br>
+              <span class="bad">1920 × 1080</span><br>
+              <span class="bad">1280 × 768</span> &nbsp;<span style="font-size:10px;color:var(--muted)">(768 ÷ 64 = 12 ✓
+                but 1280 ÷ 64 = 20 ✓ — actually fine)</span><br>
+              <span class="bad">any odd number</span>
+            </div>
+            <div class="dim-note">720 is the classic trap — looks standard but breaks the multiple-of-64 rule. Use 704
+              instead.</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+          <div class="tip bg-blue">
+            <div class="tip-label">Rule</div>
+            Both width AND height must be multiples of 64. Check each dimension independently.
+          </div>
+          <div class="tip bg-green">
+            <div class="tip-label">Frame count</div>
+            Same rule applies — frame counts should be multiples of 8, ideally (8, 16, 24, 32...).
+          </div>
+          <div class="tip bg-cyan">
+            <div class="tip-label">After upscaling</div>
+            If spatial upscaling x2, your generation res × 2 should also be valid. 512×512 → 1024×1024 ✓
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">LTX 2.3 ComfyUI Cheat Sheet · Generated by Claude</div>
+
+  </div>
+</body>
+
+</html>
